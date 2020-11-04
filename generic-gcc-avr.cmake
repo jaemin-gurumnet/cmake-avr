@@ -173,6 +173,12 @@ function(add_avr_executable EXECUTABLE_NAME)
    set(map_file ${EXECUTABLE_NAME}${MCU_TYPE_FOR_FILENAME}.map)
    set(eeprom_image ${EXECUTABLE_NAME}${MCU_TYPE_FOR_FILENAME}-eeprom.hex)
 
+   set(elf_filepath ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${elf_file})
+   set(hex_filepath ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${hex_file})
+   set(lst_filepath ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${lst_file})
+   set(map_filepath ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${map_file})
+   set(eeprom_imagepath ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${eeprom_image})
+
    # elf file
    add_executable(${elf_file} EXCLUDE_FROM_ALL ${ARGN})
 
@@ -180,22 +186,22 @@ function(add_avr_executable EXECUTABLE_NAME)
       ${elf_file}
       PROPERTIES
          COMPILE_FLAGS "-mmcu=${AVR_MCU}"
-         LINK_FLAGS "-mmcu=${AVR_MCU} -Wl,--gc-sections -mrelax -Wl,-Map,${map_file}"
+         LINK_FLAGS "-mmcu=${AVR_MCU} -Wl,--gc-sections -mrelax -Wl,-Map,${map_filepath}"
    )
 
    add_custom_command(
       OUTPUT ${hex_file}
       COMMAND
-         ${AVR_OBJCOPY} -j .text -j .data -O ihex ${elf_file} ${hex_file}
+         ${AVR_OBJCOPY} -j .text -j .data -O ihex ${elf_filepath} ${hex_filepath}
       COMMAND
-         ${AVR_SIZE_TOOL} ${AVR_SIZE_ARGS} ${elf_file}
+         ${AVR_SIZE_TOOL} ${AVR_SIZE_ARGS} ${elf_filepath}
       DEPENDS ${elf_file}
    )
 
    add_custom_command(
       OUTPUT ${lst_file}
       COMMAND
-         ${AVR_OBJDUMP} -d ${elf_file} > ${lst_file}
+         ${AVR_OBJDUMP} -d ${elf_filepath} > ${lst_filepath}
       DEPENDS ${elf_file}
    )
 
@@ -205,7 +211,7 @@ function(add_avr_executable EXECUTABLE_NAME)
       COMMAND
          ${AVR_OBJCOPY} -j .eeprom --set-section-flags=.eeprom=alloc,load
             --change-section-lma .eeprom=0 --no-change-warnings
-            -O ihex ${elf_file} ${eeprom_image}
+            -O ihex ${elf_filepath} ${eeprom_imagepath}
       DEPENDS ${elf_file}
    )
 
