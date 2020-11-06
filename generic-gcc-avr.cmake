@@ -231,14 +231,14 @@ function(add_avr_executable EXECUTABLE_NAME)
    get_directory_property(clean_files ADDITIONAL_MAKE_CLEAN_FILES)
    set_directory_properties(
       PROPERTIES
-         ADDITIONAL_MAKE_CLEAN_FILES "${map_file}"
+         ADDITIONAL_MAKE_CLEAN_FILES "${map_filepath}"
    )
 
    # upload - with avrdude
    add_custom_target(
       upload_${EXECUTABLE_NAME}
       ${AVR_UPLOADTOOL} ${AVR_UPLOADTOOL_BASE_OPTIONS} ${AVR_UPLOADTOOL_OPTIONS}
-         -U flash:w:${hex_file}
+         -U flash:w:${hex_filepath}
          -P ${AVR_UPLOADTOOL_PORT}
       DEPENDS ${hex_file}
       COMMENT "Uploading ${hex_file} to ${AVR_MCU} using ${AVR_PROGRAMMER}"
@@ -249,7 +249,7 @@ function(add_avr_executable EXECUTABLE_NAME)
    add_custom_target(
       upload_${EXECUTABLE_NAME}_eeprom
       ${AVR_UPLOADTOOL} ${AVR_UPLOADTOOL_BASE_OPTIONS} ${AVR_UPLOADTOOL_OPTIONS}
-         -U eeprom:w:${eeprom_image}
+         -U eeprom:w:${eeprom_imagepath}
          -P ${AVR_UPLOADTOOL_PORT}
       DEPENDS ${eeprom_image}
       COMMENT "Uploading ${eeprom_image} to ${AVR_MCU} using ${AVR_PROGRAMMER}"
@@ -258,7 +258,7 @@ function(add_avr_executable EXECUTABLE_NAME)
    # disassemble
    add_custom_target(
       disassemble_${EXECUTABLE_NAME}
-      ${AVR_OBJDUMP} -h -S ${elf_file} > ${EXECUTABLE_NAME}.lst
+      ${AVR_OBJDUMP} -h -S ${elf_filepath} > ${EXECUTABLE_NAME}.lst
       DEPENDS ${elf_file}
    )
 endfunction(add_avr_executable)
